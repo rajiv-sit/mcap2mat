@@ -1,0 +1,4 @@
+mcap>=1.0.0
+scipy>=1.8.0
+protobuf>=4.0.0
+orjson>=3.9.0 ; platform_python_implementation == 'CPython'

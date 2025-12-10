@@ -1,0 +1,33 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "mcap2mat (module)",
+      "type": "python",
+      "request": "launch",
+      "module": "converter.cli",
+      "args": [
+        "--in",
+        "input.mcap",
+        "--out",
+        "output.mat"
+      ],
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "mcap2mat (script)",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/converter/cli.py",
+      "args": [
+        "--in",
+        "input.mcap",
+        "--out",
+        "output.mat"
+      ],
+      "console": "integratedTerminal",
+      "justMyCode": true
+    }
+  ]
+}

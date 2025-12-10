@@ -1,0 +1,24 @@
+[project]
+name = "mcap2mat"
+version = "0.1.0"
+description = "Pure-Python MCAP to MATLAB .mat converter (cross-platform)"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+authors = [{ name = "Your Name" }]
+dependencies = [
+  "mcap>=1.0.0",
+  "scipy>=1.8.0",
+  "protobuf>=4.0.0",
+  "orjson>=3.9.0; platform_python_implementation == 'CPython'",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "ruff", "mypy"]
+
+[project.scripts]
+mcap2mat = "converter.cli:main"
+
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
