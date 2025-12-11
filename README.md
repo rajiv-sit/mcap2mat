@@ -52,5 +52,6 @@ first_payload = data.data{1}; % uint8 for binary topics
 - Install test deps (pytest is part of the editable install via requirements): `pip install -r requirements.txt`
 - Run all tests: `python -m pytest`
 - Quick sample conversion test (requires `data/data1.mcap`): `python -m pytest tests/test_data1_conversion.py`
+- MAT writer shape/records test (ensures MATLAB-friendly structs and byte handling): `python -m pytest tests/test_writer.py`
 
 MATLAB compatibility via `scipy.io.savemat`; default uncompressed for widest MATLAB version support.
