@@ -23,6 +23,13 @@ Notes
 - Topic names are sanitized to MATLAB-safe variable names. The MAT includes `topic_name_map` that maps sanitized names back to original MCAP topics.
 - Binary payloads are stored as `uint8`; JSON/Protobuf are decoded when possible (pass `--proto-set`/`--proto-path` if you want Proto decoding).
 
+Windows one-liners (example)
+```
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e .
+.\.venv\Scripts\python.exe -m converter.cli --in data/data1.mcap --out data/data1.mat
+```
+
 MATLAB example
 ```matlab
 m = load('C:/path/to/output.mat');
