@@ -51,3 +51,48 @@ def test_bytes_normalized_to_uint8_arrays():
 
     assert all(hasattr(entry, "dtype") and entry.dtype == "uint8" for entry in data_field)
     assert all(hasattr(entry, "dtype") and entry.dtype == "uint8" for entry in raw_field)
+
+
+def test_records_struct_flattened_with_raw():
+    topic_data = {
+        "topic": {
+            "timestamps": [1],
+            "encoding": ["binary"],
+            "schema": [""],
+            "data": [b"\x00\x01"],
+            "raw": [b"\x00\x01"],
+        }
+    }
+    records = [
+        {
+            "channel": "topic",
+            "log_time": 123,
+            "publish_time": 456,
+            "encoding": "binary",
+            "schema": "",
+            "data": b"\x00\x01",
+            "raw": b"\x00\x01",
+        }
+    ]
+
+    prepared = to_mat_arrays(topic_data, records=records)
+    assert "records" in prepared
+
+    rec_struct = prepared["records"]
+    assert set(rec_struct.keys()) == {
+        "channel",
+        "log_time",
+        "publish_time",
+        "encoding",
+        "schema",
+        "data",
+        "raw",
+    }
+
+    assert rec_struct["channel"][0] == "topic"
+    assert rec_struct["log_time"][0] == 123
+    assert rec_struct["publish_time"][0] == 456
+    assert rec_struct["encoding"][0] == "binary"
+    assert rec_struct["schema"][0] == ""
+    assert hasattr(rec_struct["data"][0], "dtype") and rec_struct["data"][0].dtype == "uint8"
+    assert hasattr(rec_struct["raw"][0], "dtype") and rec_struct["raw"][0].dtype == "uint8"

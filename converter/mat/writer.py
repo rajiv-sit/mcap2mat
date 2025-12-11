@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
-from typing import Dict, List, Mapping, MutableMapping
+from typing import Dict, List, Mapping, MutableMapping, Optional
 
 import numpy as np
 from scipy.io import savemat
@@ -43,7 +43,36 @@ def _matlab_safe_name(name: str, used: set[str]) -> str:
     return candidate
 
 
-def to_mat_arrays(topic_data: Mapping[str, Dict[str, List]]) -> Dict[str, object]:
+def _records_to_struct(records: List[dict]) -> Dict[str, object]:
+    """
+    Flatten per-message records into savemat-friendly struct-of-arrays.
+    """
+    if not records:
+        return {}
+
+    def object_array(seq: List[object]) -> np.ndarray:
+        return np.array(seq, dtype=object)
+
+    has_raw = any("raw" in rec for rec in records)
+
+    flattened: Dict[str, object] = {
+        "channel": object_array([rec.get("channel", "") for rec in records]),
+        "log_time": np.array([rec.get("log_time", 0) for rec in records], dtype=np.int64),
+        "publish_time": np.array([rec.get("publish_time", 0) for rec in records], dtype=np.int64),
+        "encoding": object_array([rec.get("encoding", "") for rec in records]),
+        "schema": object_array([rec.get("schema", "") for rec in records]),
+        "data": _to_object_array([rec.get("data", b"") for rec in records]),
+    }
+
+    if has_raw:
+        flattened["raw"] = _to_object_array([rec.get("raw", b"") for rec in records])
+
+    return flattened
+
+
+def to_mat_arrays(
+    topic_data: Mapping[str, Dict[str, List]], records: Optional[List[dict]] = None
+) -> Dict[str, object]:
     """
     Convert internal topic data into savemat-compatible structures.
     Each topic becomes a dict of numpy arrays or object arrays.
@@ -70,16 +99,21 @@ def to_mat_arrays(topic_data: Mapping[str, Dict[str, List]]) -> Dict[str, object
         "original": np.array(list(name_map.keys()), dtype=object),
         "matlab": np.array(list(name_map.values()), dtype=object),
     }
+
+    if records is not None:
+        mat_ready["records"] = _records_to_struct(records)
+
     return mat_ready
 
 
 def write_mat(
     path: Path,
     topic_data: Mapping[str, Dict[str, List]],
+    records: Optional[List[dict]] = None,
     compress: bool = False,
 ) -> None:
     """
     Persist the converted data into a MATLAB .mat file.
     """
-    prepared = to_mat_arrays(topic_data)
+    prepared = to_mat_arrays(topic_data, records=records)
     savemat(path.as_posix(), prepared, do_compression=compress)

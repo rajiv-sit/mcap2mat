@@ -47,6 +47,7 @@ def run_conversion(cfg: config.Config) -> bool:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
     registry = ProtoRegistry(cfg.proto_set) if cfg.proto_set else None
     topic_data: Dict[str, Dict[str, List]] = {}
+    records: List[dict] = []
     seen_topics = set()
 
     for schema, channel, message in iter_messages(cfg.input_path, cfg.topics):
@@ -83,10 +84,22 @@ def run_conversion(cfg: config.Config) -> bool:
         if cfg.keep_raw:
             bucket.setdefault("raw", []).append(raw_payload)
 
+        record = {
+            "channel": topic,
+            "log_time": message.log_time,
+            "publish_time": message.publish_time,
+            "encoding": decoder_kind,
+            "schema": schema_name or "",
+            "data": decoded,
+        }
+        if cfg.keep_raw:
+            record["raw"] = raw_payload
+        records.append(record)
+
     if cfg.dry_run:
         LOG.info("Dry run complete. Topics seen: %s", sorted(seen_topics))
         return True
 
-    write_mat(cfg.output_path, topic_data, compress=cfg.compress_mat)
+    write_mat(cfg.output_path, topic_data, records=records, compress=cfg.compress_mat)
     LOG.info("Wrote MAT file to %s", cfg.output_path)
     return True
