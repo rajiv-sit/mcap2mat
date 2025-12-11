@@ -1,0 +1,16 @@
+# Python virtual environments
+.venv/
+
+# Bytecode caches
+__pycache__/
+*/__pycache__/
+
+# MCAP/MAT sample data (large/uncommitted artifacts)
+data/
+
+# Build/metadata artifacts
+*.egg-info/
+
+# OS/editor cruft
+.DS_Store
+Thumbs.db
