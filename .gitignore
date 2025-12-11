@@ -5,8 +5,8 @@
 __pycache__/
 */__pycache__/
 
-# MCAP/MAT sample data (large/uncommitted artifacts)
-data/
+# MCAP/MAT artifacts
+data/*.mat
 
 # Build/metadata artifacts
 *.egg-info/
